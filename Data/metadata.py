@@ -20,5 +20,3 @@ class Metadate(Base):
         self.SongName = song_name
         self.ReleaseDate = release_date
         self.Tags = tags
-
-

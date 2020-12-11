@@ -1,16 +1,6 @@
-from datetime import date
-
-from Controller.MetadataController import MetadataController
-
-# Press the green button in the gutter to run the script.
+from Business.SongStorage import SongStorage
 if __name__ == '__main__':
 
-    meta = MetadataController()
-    # meta.delete_metadata(1)
-    # meta.insert_metadata("Storage", "FS", "Summner", date(1970, 10, 8), "#hello")
-    songs = meta.update_metadata(2, {"FileName": "storage", "Artist": "Vl"})
-    meta.print_metadata(songs)
-    songs = meta.get_metadata()
-    for song in songs:
-        meta.print_metadata(song)
+    songStorage = SongStorage()
+    songStorage.run()
 
