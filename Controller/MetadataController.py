@@ -104,4 +104,4 @@ class MetadataController:
         Print a song to console
         :param meta: metadata to be displayed
         """
-        print(f'{meta.Id}  {meta.FileName}    {meta.Artist}    {meta.SongName}    {meta.ReleaseDate}    {meta.Tags} ')
+        print(f'{meta.Id}    {meta.Artist}    {meta.SongName}    {meta.ReleaseDate}    {meta.Tags} ')

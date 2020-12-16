@@ -161,7 +161,6 @@ class SongStorage:
             except FileNotFoundError:
                 print("Wrong Path")
 
-
     def play_song(self):
         """
         Reads an id from keyboard and play a the song using web browser library
@@ -188,7 +187,8 @@ class SongStorage:
         If a command didn't exist will display an error message
 
         """
-        command = input("Introduceti o comanda")
+        print("Enter a command: Add_song   Delete_song   Modify_data   Search   Create_save_list   Play")
+        command = input("-->")
 
         while command != "quit":
 
@@ -209,6 +209,6 @@ class SongStorage:
             else:
                 print("wrong command")
 
-            command = input("Introduceti o comanda")
-
+            print("Enter a command: Add_song   Delete_song   Modify_data   Search   Create_save_list   Play")
+            command = input("-->")
         print("bye")
