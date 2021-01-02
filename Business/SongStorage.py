@@ -1,5 +1,5 @@
 import zipfile
-import webbrowser
+from pygame import mixer
 from datetime import datetime
 from pathlib import Path
 from Controller.MetadataController import MetadataController
@@ -36,6 +36,7 @@ class SongStorage:
         Execute commands
 
     """
+
     def __init__(self):
         self.metaController = MetadataController()
         self.storageController = StorageController(proprieties.storage_destination)
@@ -57,10 +58,12 @@ class SongStorage:
         if song_name.exists():
 
             file_path = self.storageController.insert_song(file_path)
-            _id = self.metaController. \
-                insert_metadata(file_path, artist, song_name.name,
-                                datetime.strptime(release_date, '%d %m %Y'), tags)
-
+            try:
+                _id = self.metaController. \
+                    insert_metadata(file_path, artist, song_name.name,
+                                    datetime.strptime(release_date, '%d %m %Y'), tags)
+            except ValueError:
+                print("invalid params")
             if _id is None:
                 print("fail adding the song")
             else:
@@ -169,9 +172,22 @@ class SongStorage:
         _id = input("id:")
         song = self.metaController.get_by_id(_id)
         if song is not None:
-            webbrowser.open(song.FileName)
+            try:
+                mixer.init()
+                mixer.music.load(song.FileName)
+                mixer.music.play()
+            except IOError:
+                print("Error playing the song ")
+            print("Now playing:", song.Name)
         else:
             print("This id did not exist")
+
+    @staticmethod
+    def stop_song():
+        try:
+            mixer.music.stop()
+        except IOError:
+            print("Error")
 
     def display_all(self):
         """
@@ -204,11 +220,13 @@ class SongStorage:
                 self.create_save_list()
             elif command == "Play":
                 self.play_song()
+            elif command == "Stop":
+                self.stop_song()
             elif command == "Display_all":
                 self.display_all()
             else:
                 print("wrong command")
 
-            print("Enter a command: Add_song   Delete_song   Modify_data   Search   Create_save_list   Play")
+            print("Enter a command: Add_song   Delete_song   Modify_data   Search   Create_save_list   Play   Stop")
             command = input("-->")
         print("bye")
