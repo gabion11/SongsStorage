@@ -1,4 +1,6 @@
 import zipfile
+
+import pygame
 from pygame import mixer
 from datetime import datetime
 from pathlib import Path
@@ -154,7 +156,7 @@ class SongStorage:
         songs = self.metaController.get_metadata(new_data)
 
         if songs.count() == 0:
-            print("No songs founded")
+            print("No songs found")
         else:
             try:
                 _zip = zipfile.ZipFile(path, "w", zipfile.ZIP_DEFLATED)
@@ -162,7 +164,9 @@ class SongStorage:
                     _zip.write(song.FileName)
                 _zip.close()
             except FileNotFoundError:
-                print("Wrong Path")
+                print("Some file are missing")
+            except PermissionError:
+                print("Wrong path")
 
     def play_song(self):
         """
@@ -178,7 +182,10 @@ class SongStorage:
                 mixer.music.play()
             except IOError:
                 print("Error playing the song ")
-            print("Now playing:", song.Name)
+            except pygame.error:
+                print("Error playing the song")
+            else:
+                print("Now playing:", song.SongName)
         else:
             print("This id did not exist")
 
@@ -188,6 +195,8 @@ class SongStorage:
             mixer.music.stop()
         except IOError:
             print("Error")
+        except pygame.error:
+            print("Can't stop the song")
 
     def display_all(self):
         """
