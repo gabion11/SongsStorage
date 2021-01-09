@@ -9,3 +9,21 @@ Tool-ul permite mai multe operatii, printre care:
 - Search - cauta o melodii dupa anumite criterii si intoarce metadatel
 - Play - porneste o melodie
 - Stop - opreste melodia curenta
+
+## Installation
+1. Clone the repo
+```bash
+git clone https://github.com/gabion11/SongsStorage.git
+```
+2. Install SQLAlchemy
+```
+pip install SQLAlchemy
+```
+3. Install pygame
+```
+pip install pygame
+```
+
+## License
+[MIT](https://choosealicense.com/licenses/mit/)
+

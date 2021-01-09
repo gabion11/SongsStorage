@@ -60,16 +60,19 @@ class SongStorage:
         if song_name.exists():
 
             file_path = self.storageController.insert_song(file_path)
-            try:
-                _id = self.metaController. \
-                    insert_metadata(file_path, artist, song_name.name,
-                                    datetime.strptime(release_date, '%d %m %Y'), tags)
-            except ValueError:
-                print("invalid params")
-            if _id is None:
-                print("fail adding the song")
+            if file_path is not None:
+                try:
+                    _id = self.metaController. \
+                        insert_metadata(file_path, artist, song_name.name,
+                                        datetime.strptime(release_date, '%d %m %Y'), tags)
+                except ValueError:
+                    print("invalid params")
+                if _id is None:
+                    print("fail adding the song")
+                else:
+                    print("the song was added with id= ", _id)
             else:
-                print("the song was added with id= ", _id)
+                print("Error copying the file")
         else:
             print("Wrong path")
 
@@ -84,9 +87,9 @@ class SongStorage:
             print("This id did not exist")
         else:
             file_path = song.FileName
-            self.metaController.delete_metadata(_id)
-            self.storageController.delete_song(file_path)
-            print("Delete successful")
+            if self.storageController.delete_song(file_path):
+                self.metaController.delete_metadata(_id)
+                print("Delete successful")
 
     def modify_data(self):
         """
@@ -165,7 +168,7 @@ class SongStorage:
                 _zip.close()
             except FileNotFoundError:
                 print("Some file are missing")
-            except PermissionError:
+            except :
                 print("Wrong path")
 
     def play_song(self):
@@ -193,6 +196,7 @@ class SongStorage:
     def stop_song():
         try:
             mixer.music.stop()
+            mixer.music.unload()
         except IOError:
             print("Error")
         except pygame.error:

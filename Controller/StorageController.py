@@ -1,7 +1,9 @@
+import glob
 import shutil
 import os
-import glob
 from pathlib import Path
+import hashlib
+from Controller.MetadataController import MetadataController
 
 
 class StorageController:
@@ -31,67 +33,91 @@ class StorageController:
 
     def insert_song(self, source):
         """
-            Insets a song in destination folder. If the song name already exists, compare files binary if the content is
+            Insets a song in destination folder.
+            If create the folder if it didn't exist
+            Save the file with his hash as file name
+
             different rename the current file
 
         :param source: a path file
-        :return:  the path to the newly created file
+        :return:  the path to the newly created file or None if an error appears
         """
+        # check if the storage exist otherwise create this
+        if Path(self.destination).exists():
+            print("")
+        else:
+            print("Storage folder doesn't exist")
+
+            try:
+                os.mkdir(Path(self.destination))
+            except:
+                print("Error creating the folder")
+                return None
+            print("Storage created successfully")
 
         song_name = Path(source)
-        files = glob.glob(self.destination+'/*')
+        hash_name = self.getHash(source)
+        if hash_name == "":
+            print("Error hashing the file")
+            return None
 
+        files = glob.glob(self.destination + '/*')
+        # check if the file already exist
         for file in files:
             file = Path(file)
-            if file.name == song_name.name:
-                # verify if the content is the same
-                if not self.compareFiles(file, source):
-                    name_without_ext = song_name.stem
-                    ext = song_name.suffix
-                    try:
-                        song_name.rename(Path(song_name.parent, f"{name_without_ext}_{self.counter}_{ext}"))
+            if file.name == hash_name + song_name.suffix:
+                return str(file).replace(chr(92), "/")
 
-                    except PermissionError:
-                        print("Permission denied")
-                    except IOError:
-                        print("try again")
-
-                    source = str(source).replace(f"{name_without_ext}{ext}", f"{name_without_ext}_{self.counter}_{ext}")
-                    self.counter += 1
+        # copy the file in the storage
         try:
-            return shutil.copy(source, self.destination)
-        except IOError:
-            print("Error copping the file")
+            newPath = shutil.copy(source, self.destination)
+        except:
+            print("Error copying the file")
+            return None
+
+        song_name = Path(newPath)
+        # rename the file with hash
+        try:
+            song_name.rename(Path(song_name.parent, f"{hash_name}{song_name.suffix}"))
+        except:
+            print("Error renaming the file")
+            return None
+
+        return str('Storage/' + hash_name+song_name.suffix)
 
     @staticmethod
     def delete_song(file_path):
         """
          Deletes a song from destination.
         :param file_path: Path of the file to be deleted
+        :return True if the file was removed successfully
         """
-        try:
-            os.remove(file_path)
-        except IOError:
-            print("Error removing the file")
+        meta = MetadataController()
+        meta = meta.get_all_metadata()
+
+        counter = 0
+        for song in meta:
+            if song.FileName == file_path:
+                counter = counter + 1
+
+        if counter == 0:
+            try:
+                os.remove(file_path)
+                return True
+            except IOError:
+                print("Error removing the file")
 
     @staticmethod
-    def compareFiles(file1, file2):
-        """
-        Compares binary two files
-        :param file1: File Path of file number one
-        :param file2: File Path of file number two
-        :return: true if file1 is equal with file2
-                false otherwise
-        """
+    def getHash(file_path):
         try:
-            with open(file1, "rb") as one:
-                with open(file2, "rb") as two:
-                    chunk = other = True
-                    while chunk or other:
-                        chunk = one.read(1000)
-                        other = two.read(1000)
-                        if chunk != other:
-                            return False
-                    return True
-        except IOError:
-            print("Unable to open the files")
+            m = hashlib.sha1()
+            f = open(file_path, "rb")
+            while True:
+                data = f.read(4096)
+                if len(data) == 0:
+                    break
+                m.update(data)
+            f.close()
+            return m.hexdigest()
+        except:
+            return ""
