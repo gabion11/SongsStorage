@@ -24,6 +24,4 @@ pip install SQLAlchemy
 pip install pygame
 ```
 
-## License
-[MIT](https://choosealicense.com/licenses/mit/)
 
