@@ -92,20 +92,12 @@ class StorageController:
         :param file_path: Path of the file to be deleted
         :return True if the file was removed successfully
         """
-        meta = MetadataController()
-        meta = meta.get_all_metadata()
 
-        counter = 0
-        for song in meta:
-            if song.FileName == file_path:
-                counter = counter + 1
-
-        if counter == 0:
-            try:
-                os.remove(file_path)
-                return True
-            except IOError:
-                print("Error removing the file")
+        try:
+            os.remove(file_path)
+            return True
+        except IOError:
+            print("Error removing the file")
 
     @staticmethod
     def getHash(file_path):

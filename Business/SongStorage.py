@@ -87,7 +87,18 @@ class SongStorage:
             print("This id did not exist")
         else:
             file_path = song.FileName
-            if self.storageController.delete_song(file_path):
+            meta = self.metaController.get_all_metadata()
+
+            counter = 0
+            for song in meta:
+                if song.FileName == file_path:
+                    counter = counter + 1
+
+            if counter == 1:
+                if self.storageController.delete_song(file_path):
+                    self.metaController.delete_metadata(_id)
+                    print("Delete successful")
+            else:
                 self.metaController.delete_metadata(_id)
                 print("Delete successful")
 
